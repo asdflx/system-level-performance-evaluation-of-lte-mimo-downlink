@@ -8,8 +8,8 @@ pNoiseDbm = -174;
 nUsers = 10;    % nUsers = 10: 5: 50;
 % distance covered by the cell (in meters) [d]
 dMin = 35; dMax = 250; 
-% number of neighbour base stations to produce interference [j]
-nInterfBss = 6;
+% coordinate of neighbour base stations to produce interference [j]
+bsInterf = 2 * dMax * exp(1i * pi / 3 * (0: 5));
 % number of transmit antennas at each base station [nt]
 nTxs = 4;
 % number of receive antennas at each user [nr]
@@ -33,6 +33,8 @@ fading = cell(nSamples, nUsers);
 d = randi([dMin, dMax], nUsers, 1);
 % angle (in radian) [?]
 phase = 2 * pi * rand(nUsers, 1);
+% coordinate of users
+user = d .* exp(1i * phase);
 % transmit correlation matrix of base station i and user q [Rt]
 for iUser = 1: nUsers
     corTx = corSpatialConst * exp(1i * phase(iUser));
