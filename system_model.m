@@ -14,6 +14,8 @@ bsInterf = 2 * dMax * exp(1i * pi / 3 * (0: 5));
 nTxs = 4;
 % number of receive antennas at each user [nr]
 nRxs = 1;    % nRxs = 1: 2;
+% standard deviation of shadowing (in dB) [?s]
+stdShadowing = 8;
 % time correlation [?]
 corTime = 0.85;    % corTime = 0: 0.1: 1;
 % spatial correlation [t]
@@ -21,6 +23,8 @@ corSpatialConst = 0.5;    %corSpatialConst = 0: 0.1: 1;
 % number of sampling (i.e. times of parameters update)
 nSamples = 1e3;
 % declare vars
+% shadowing is a stochastic process (in dB) [S]
+shadowingDb = zeros(nSamples, nUsers);
 % transmit correlation matrix [Rt]
 corSpatial = cell(1, nUsers);
 % temporally correlated Rayleigh flat fading channel [Htilde]
@@ -40,14 +44,9 @@ for iUser = 1: nUsers
     corTx = corSpatialConst * exp(1i * phase(iUser));
     corSpatial{iUser} = toeplitz([1, corTx, corTx ^ 2, corTx ^ 3]);
 end
-%% Path-loss and shadowing
+%% Path-loss, shadowing and fading
 % path loss model (in dB) [?0]
 pathLossDb = 128.1 + 37.6 * log10(1e3 * d);
-% standard deviation of shadowing (in dB) [?s]
-stdShadowing = 8;
-% shadowing model (in dB) [S]
-shadowingDb = stdShadowing ^ 2 * randn(nUsers, 1);
-%% Fading
 % assume spatially and temporally correlated Rayleigh flat fading channel
 for iSample = 1: nSamples
     for iUser = 1: nUsers
@@ -59,6 +58,8 @@ for iSample = 1: nSamples
             % temporally correlated to the previous state
             fadingTempCor{iSample, iUser} = corTime * fadingTempCor{iSample - 1, iUser} + sqrt(1 - corTime ^ 2) * randn(nRxs, nTxs);
         end
+        % shadowing model (in dB) [S]
+        shadowingDb(iSample, iUser) = stdShadowing * randn;
         % spatially and temporally correlated channel [H]
         fading{iSample, iUser} = fadingTempCor{iSample, iUser} * corSpatial{iUser} ^ (1 / 2);
     end
