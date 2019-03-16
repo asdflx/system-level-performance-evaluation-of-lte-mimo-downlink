@@ -49,6 +49,15 @@ for iSample = 1: nSamples
         end
         % spatially and temporally correlated channel [H]
         fading{iSample, iUser} = fadingTempCor{iSample, iUser} * corSpatial{iUser} ^ (1 / 2);
+        %% Select precoding matrix
+        ri = 1;
+        target = zeros(16, 1);
+        for iPmi = 0: 15
+            [cdit] = codebook_csi_4tx(ri, iPmi);
+            target(iPmi + 1) = abs(fading{iSample, iUser} * cdit) .^ 2;
+        end
+        pmi = find(target == max(target)) - 1;
+        precoder = codebook_csi_4tx(ri, pmi);
     end
 end
 end
