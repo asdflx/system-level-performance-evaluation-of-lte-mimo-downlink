@@ -14,7 +14,7 @@ dMin = 35; dMax = 250;
 nInterfs = 6;
 bsInterf = 2 * dMax * exp(1i * 2 * pi / nInterfs * (1: nInterfs)');
 % standard deviation of shadowing (in dB) [?s]
-stdShadowing = 8;
+sdShadowing = 8;
 % number of drops (i.e. generate user distributions)
 nDrops = 1e2;
 % long-time SINR
@@ -33,10 +33,10 @@ for iDrop = 1: nDrops
     dInterf = abs(bsInterf - user);
     %% Path-loss, shadowing and Long-term SINR
     % path loss and shadowing of center base station
-    centerPsDb = 128.1 + 37.6 * log10(dCenter / 1e3) + stdShadowing * randn(1, nUsers);
+    centerPsDb = 128.1 + 37.6 * log10(dCenter / 1e3) + sdShadowing * randn(1, nUsers);
     centerPs = db2pow(centerPsDb);
     % interference path loss and shadowing
-    interfPsDb = 128.1 + 37.6 * log10(dInterf / 1e3) + stdShadowing * randn(nInterfs, nUsers);
+    interfPsDb = 128.1 + 37.6 * log10(dInterf / 1e3) + sdShadowing * randn(nInterfs, nUsers);
     interfPs = db2pow(interfPsDb);
     % long-term SINR of a drop
     ltSinr(iDrop, :) = (pTx ./ centerPs) ./ (pNoise + sum(pTx ./ interfPs));
