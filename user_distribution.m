@@ -1,4 +1,4 @@
-function [dCenter, dInterf, corSpatial] = user_distribution(dMin, dMax, nUsers, nInterfs, corSpatialConst)
+function [dCenter, dInterf, corSpatial, corSpatialInterf] = user_distribution(dMin, dMax, nUsers, nInterfs, corSpatialConst)
 % Function: 
 %   - Return coordinate and spatial correlation of users in one drop
 %
@@ -11,7 +11,9 @@ function [dCenter, dInterf, corSpatial] = user_distribution(dMin, dMax, nUsers, 
 % OutputArg(s):
 %   - dCenter: distance to the center base station
 %   - dInterf: distance to the interference base stations
-%   - corSpatial: transmit correlation matrix of center station and user q [Rt]
+%   - corSpatial: transmit correlation matrix of center station and user [Rt]
+%   - corSpatialInterf: correlation matrix of interference base stations 
+%   and user
 %
 % Comments:
 %   - assume no intercell spatial correlation
@@ -22,6 +24,7 @@ function [dCenter, dInterf, corSpatial] = user_distribution(dMin, dMax, nUsers, 
 bsInterf = 2 * dMax * exp(1i * 2 * pi / nInterfs * (1: nInterfs)');
 % transmit correlation matrix [Rt]
 corSpatial = cell(1, nUsers);
+corSpatialInterf = cell(1, nUsers);
 % distance between users and base station (in meters) [d]
 dCenter = randi([dMin, dMax], 1, nUsers);
 % angle (in radian) [?]
@@ -34,6 +37,8 @@ dInterf = abs(bsInterf - user);
 for iUser = 1: nUsers
     corTx = corSpatialConst * exp(1i * phase(iUser));
     corSpatial{iUser} = toeplitz([1, corTx, corTx ^ 2, corTx ^ 3]);
+    % no spatial correlation for interference base stations
+    corSpatialInterf{iUser} = eye(4);
 end
 end
 
