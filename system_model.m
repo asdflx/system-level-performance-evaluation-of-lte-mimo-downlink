@@ -26,17 +26,16 @@ corSpatialConst = 0.5;
 nSamples = 1e3;
 % number of drops (i.e. generate user distributions)
 nDrops = 1e1;
-% fading from interference base stations
-fadingInterf = cell(1, nInterfs);
-fadingTemporalInterf = cell(1, nInterfs);
 %% System model
 %s generate user location randomly and uniformly (assume users don't move)
 for iDrop = 1: nDrops
     % user distribution
     [dCenter, dInterf, corSpatial, corSpatialInterf] = user_distribution(dMin, dMax, nUsers, nInterfs, corSpatialConst);
-    % initialise channel
-    fadingTemporalPrev = cell(1, nUsers);
-    fadingTemporalInterfPrev = cell(nInterfs, nUsers);
+    % fading of center base station is spatially and temporally correlated
+    fadingTemporal = cell(1, nUsers);
+    % fading of interference base stations are temporally correlated
+    fadingInterf = cell(nInterfs, nUsers);
+    fadingInterfTemporal = cell(nInterfs, nUsers);
     for iSample = 1: nSamples
         % path loss and shadowing of center base station
         psCenterDb = 128.1 + 37.6 * log10(dCenter / 1e3) + sdShadowing * randn(1, nUsers);
@@ -45,18 +44,12 @@ for iDrop = 1: nDrops
         psInterfDb = 128.1 + 37.6 * log10(dInterf / 1e3) + sdShadowing * randn(nInterfs, nUsers);
         psInterf = db2pow(psInterfDb);
         % fading from center base station
-        [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporalPrev, corTime, corSpatial, nRxs, nTxs);
-        % update channel status
-        fadingTemporalPrev = fadingTemporal;
+        [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporal, corTime, corSpatial, nRxs, nTxs);
         % fading from interference base stations
         for iInterf = 1: nInterfs
-            [fadingInterf{iInterf}, fadingTemporalInterf{iInterf}] = fading_channel(nUsers, fadingTemporalInterfPrev(iInterf, :), corTime, corSpatialInterf, nRxs, nTxs);
-            % update channel status
-            fadingTemporalInterfPrev(iInterf) = fadingTemporalInterf(iInterf);
+            [fadingInterf(iInterf, :), fadingInterfTemporal(iInterf, :)] = fading_channel(nUsers, fadingInterfTemporal(iInterf, :), corTime, corSpatialInterf, nRxs, nTxs);
         end
-        % SINR of streams
-%         [sinr] = stream_sinr(nTxs, nRxs, nUsers, fading, pTx, pNoise);
         % quantised precoding matrix
-        [precoder] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
+        [ri, pmi, cqi] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
     end
 end
