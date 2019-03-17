@@ -22,10 +22,16 @@ sdShadowing = 8;
 corTime = 0.85;
 % spatial correlation [t]
 corSpatialConst = 0.5;
-% number of sampling (i.e. times of parameters update)
-nSamples = 1e3;
+% drop duration (large enough to avoid transient state in the end)
+tDrop = 1e3;
+% scheduling time scale [tc]
+tScale = 1e1;
 % number of drops (i.e. generate user distributions)
 nDrops = 1e1;
+% quality of service (assume equal)
+qos = ones(1, nUsers);
+% user average rate
+rate = zeros(nDrops, nUsers);
 %% System model
 %s generate user location randomly and uniformly (assume users don't move)
 for iDrop = 1: nDrops
@@ -33,9 +39,13 @@ for iDrop = 1: nDrops
     % model temporal correlation
     fadingTemporal = cell(1, nUsers);
     fadingInterfTemporal = cell(nInterfs, nUsers);
+    % initialise scheduled user index and the average rate
+    userIndex = 0;
+    avgRate = zeros(1, nUsers) + eps;
+    instRate = zeros(tDrop, nUsers);
     % user distribution
     [dCenter, dInterf, corSpatial, corSpatialInterf] = user_distribution(dMin, dMax, nUsers, nInterfs, corSpatialConst);
-    for iSample = 1: nSamples
+    for iSample = 1: tDrop
         % path loss and shadowing of center and interference base stations
         [psCenter, psInterf] = pathloss_shadowing(nUsers, nInterfs, dCenter, dInterf, sdShadowing);
         % fading of center base station
@@ -46,5 +56,16 @@ for iDrop = 1: nDrops
         end
         % quantised precoding matrix
         [ri, pmi, cqi] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
+        % proportional fair scheduling
+        [avgRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, avgRate, tScale, qos, iSample, userIndex);
+        instRate(iSample, userIndex) = cqi(userIndex);
     end
+    rate(iDrop, :) = mean(instRate);
 end
+%% Result plot: CDF of user average rate
+figure;
+cdfplot(rate(:));
+grid on; grid minor;
+title('CDF of user average rate');
+xlabel('Average rate (bps/Hz)');
+ylabel('CDF (%)');

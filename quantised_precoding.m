@@ -88,9 +88,9 @@ for iUser = 1: nUsers
         end
     end
     % optimum single-layer and double-layer precoder
-    [rate, index] = max(rate);
+    [rate, pmiIndex] = max(rate);
     % select transmit mode (1 or 2 layers) to maximise rate
     [cqi(iUser), ri(iUser)] = max(rate);
-    pmi(iUser) = index(ri(iUser));
+    pmi(iUser) = pmiIndex(ri(iUser));
 end
 end
