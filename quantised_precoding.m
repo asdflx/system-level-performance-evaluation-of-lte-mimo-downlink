@@ -11,8 +11,8 @@ function [ri, pmi, cqi] = quantised_precoding(nUsers, nRxs, fading, fadingInterf
 %   - fadingInterf: fading from interference base stations
 %   - psCenter: path loss and shadowing of center base station
 %   - psInterf: path loss and shadowing of interference base stations
-%   - pTx: transmit power [Pt]
-%   - pNoise: noise power [?]
+%   - pTx: transmit power
+%   - pNoise: noise power
 %
 % OutputArg(s):
 %   - ri: the number of streams or layers transmitted to the user

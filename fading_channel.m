@@ -7,8 +7,8 @@ function [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporalPrev, c
 %   - nUsers: number of users in one cell
 %   - fadingTemporalPrev: temporally correlated (spatially uncorrelated) 
 %   channel in the previous state
-%   - corTime: time correlation [?]
-%   - corSpatial: transmit correlation matrix of center station and user q [Rt]
+%   - corTime: time correlation
+%   - corSpatial: transmit correlation matrix of center station and user
 %   - nRxs, nTxs: number of receive and transmit antennas
 %
 % OutputArg(s):
@@ -31,7 +31,7 @@ for iUser = 1: nUsers
         % temporally correlated to the previous state
         fadingTemporal{iUser} = corTime * fadingTemporalPrev{iUser} + sqrt(1 - corTime ^ 2) * randn(nRxs, nTxs);
     end
-    % spatially and temporally correlated channel [H]
+    % spatially and temporally correlated channel
     fading{iUser} = fadingTemporal{iUser} * corSpatial{iUser} ^ (1 / 2);
 end
 end
