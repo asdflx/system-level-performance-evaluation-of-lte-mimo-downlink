@@ -39,11 +39,11 @@ for iDrop = 1: nDrops
     fadingTemporalInterfPrev = cell(nInterfs, nUsers);
     for iSample = 1: nSamples
         % path loss and shadowing of center base station
-        centerPsDb = 128.1 + 37.6 * log10(dCenter / 1e3) + sdShadowing * randn(1, nUsers);
-        centerPs = db2pow(centerPsDb);
+        psCenterDb = 128.1 + 37.6 * log10(dCenter / 1e3) + sdShadowing * randn(1, nUsers);
+        psCenter = db2pow(psCenterDb);
         % interference path loss and shadowing
-        interfPsDb = 128.1 + 37.6 * log10(dInterf / 1e3) + sdShadowing * randn(nInterfs, nUsers);
-        interfPs = db2pow(interfPsDb);
+        psInterfDb = 128.1 + 37.6 * log10(dInterf / 1e3) + sdShadowing * randn(nInterfs, nUsers);
+        psInterf = db2pow(psInterfDb);
         % fading from center base station
         [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporalPrev, corTime, corSpatial, nRxs, nTxs);
         % update channel status
@@ -57,6 +57,6 @@ for iDrop = 1: nDrops
         % SINR of streams
 %         [sinr] = stream_sinr(nTxs, nRxs, nUsers, fading, pTx, pNoise);
         % quantised precoding matrix
-        [precoder] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, centerPs, interfPs, pTx, pNoise);
+        [precoder] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
     end
 end

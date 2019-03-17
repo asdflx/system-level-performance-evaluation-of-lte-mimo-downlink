@@ -33,13 +33,13 @@ for iDrop = 1: nDrops
     dInterf = abs(bsInterf - user);
     %% Path-loss, shadowing and Long-term SINR
     % path loss and shadowing of center base station
-    centerPsDb = 128.1 + 37.6 * log10(dCenter / 1e3) + sdShadowing * randn(1, nUsers);
-    centerPs = db2pow(centerPsDb);
+    psCenterDb = 128.1 + 37.6 * log10(dCenter / 1e3) + sdShadowing * randn(1, nUsers);
+    psCenter = db2pow(psCenterDb);
     % interference path loss and shadowing
-    interfPsDb = 128.1 + 37.6 * log10(dInterf / 1e3) + sdShadowing * randn(nInterfs, nUsers);
-    interfPs = db2pow(interfPsDb);
+    psInterfDb = 128.1 + 37.6 * log10(dInterf / 1e3) + sdShadowing * randn(nInterfs, nUsers);
+    psInterf = db2pow(psInterfDb);
     % long-term SINR of a drop
-    ltSinr(iDrop, :) = (pTx ./ centerPs) ./ (pNoise + sum(pTx ./ interfPs));
+    ltSinr(iDrop, :) = (pTx ./ psCenter) ./ (pNoise + sum(pTx ./ psInterf));
 end
 ltSinrDb = pow2db(ltSinr);
 %% Result plot: CDF of long-term SINR
