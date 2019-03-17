@@ -1,4 +1,4 @@
-function [precoder] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise)
+function [ri, pmi, cqi] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise)
 % Function:
 %   - return the best precoder (beamforming vector) from the codebook based
 %   on the channel state and the number of available layers
@@ -15,7 +15,10 @@ function [precoder] = quantised_precoding(nUsers, nRxs, fading, fadingInterf, ps
 %   - pNoise: noise power [?]
 %
 % OutputArg(s):
-%   - precoder: the best precoder (beamforming vector) to maximise the rate
+%   - ri: the number of streams or layers transmitted to the user
+%   - pmi: index of the preferred precoder in the codebook corresponding to
+%   RI
+%   - cqi: the maximum achievable rate by the selected RI and PMI
 %
 % Restraints:
 %   - only support 4-tx with 1 or 2 layers now (ri = 1 or 2)
@@ -29,40 +32,41 @@ nPmis = 16;
 nInterfs = size(psInterf, 1);
 precoder1 = cell(nPmis, 1);
 precoder2 = cell(nPmis, 1);
-%% Precoders Design
+ri = zeros(1, nUsers);
+pmi = zeros(1, nUsers);
+cqi = zeros(1, nUsers);
+%% Precoder Design
 for iPmi = 0: nPmis - 1
     % single layer transmission
     [precoder1{iPmi + 1}] = codebook_csi_4tx(1, iPmi) * sqrt(pTx);
     % double layer transmission
     [precoder2{iPmi + 1}] = codebook_csi_4tx(2, iPmi) * sqrt(pTx / 2 * eye(2));
 end
-%% Maximise Rate by Precoder Selection
+%% Precoder Selection
 for iUser = 1: nUsers
-    covIn1 = cell(nPmis, 1);
-    covIn2 = cell(nPmis, 2);
-    combiner1 = cell(nPmis, 1);
-    combiner2 = cell(nPmis, 2);
-    sinr1 = zeros(nPmis, 1);
-    sinr2 = zeros(nPmis, 2);
+%     combiner1 = cell(nPmis, 1);
+%     combiner2 = cell(nPmis, 2);
+    rate = zeros(nPmis, 2);
     for iPmi = 0: nPmis - 1
-        if nRxs == 1
-            precoder = precoder1{iPmi + 1};
-            % inter-cell interference
-            interCell = cell(nInterfs, 1);
-            for iInterf = 1: nInterfs
-                precoderIc = precoder1{randi([1, nPmis])};
-                interCell{iInterf} = 1 / psInterf(iInterf, iUser) * fadingInterf{iInterf}{iUser} * precoderIc * (fadingInterf{iInterf}{iUser} * precoderIc)';
-            end
-            interCell = sum(cat(3, interCell{:}), 3);
-            % noise
-            noise = pNoise * eye(nRxs);
-            % covariance matrix of interference plus noise
-            covIn1{iPmi + 1} = interCell + noise;
-            % MMSE combiner
-            combiner1{iPmi + 1} = 1 / sqrt(psCenter(iUser)) * (fading{iUser} * precoder)' / covIn1{iPmi + 1};
-            % SINR of the current stream
-            sinr1(iPmi + 1) = 1 / psCenter(iUser) * (fading{iUser} * precoder)' / covIn1{iPmi + 1} * fading{iUser} * precoder;
-        elseif nRxs == 2
+        precoder = precoder1{iPmi + 1};
+        % inter-cell interference
+        interCell = cell(nInterfs, 1);
+        for iInterf = 1: nInterfs
+            precoderIc = precoder1{randi([1, nPmis])};
+            interCell{iInterf} = 1 / psInterf(iInterf, iUser) * fadingInterf{iInterf}{iUser} * precoderIc * (fadingInterf{iInterf}{iUser} * precoderIc)';
+        end
+        interCell = sum(cat(3, interCell{:}), 3);
+        % noise
+        noise = pNoise * eye(nRxs);
+        % covariance matrix of interference plus noise
+        covIn = interCell + noise;
+%         % MMSE combiner
+%         combiner1{iPmi + 1} = 1 / sqrt(psCenter(iUser)) * (fading{iUser} * precoder)' / covIn;
+        % SINR of the current stream
+        sinr = 1 / psCenter(iUser) * (fading{iUser} * precoder)' / covIn * fading{iUser} * precoder;
+        % achievable rate
+        rate(iPmi + 1, 1) = log2(1 + sinr);
+        if nRxs == 2
             % two available layers
             for iLayer = 1: nRxs
                 % inter-stream interference
@@ -79,13 +83,20 @@ for iUser = 1: nUsers
                 % noise
                 noise = pNoise * eye(nRxs);
                 % covariance matrix of interference plus noise
-                covIn2{iPmi + 1, iLayer} = interStream + interCell + noise;
-                % MMSE combiner
-                combiner2{iPmi + 1, iLayer} = 1 / sqrt(psCenter(iUser)) * (fading{iUser} * precoder)' / covIn2{iPmi + 1, iLayer};
+                covIn = interStream + interCell + noise;
+%                 % MMSE combiner
+%                 combiner2{iPmi + 1, iLayer} = 1 / sqrt(psCenter(iUser)) * (fading{iUser} * precoder)' / covIn;
                 % SINR of the current stream
-                sinr2(iPmi + 1, iLayer) = 1 / psCenter(iUser) * (fading{iUser} * precoder)' / covIn2{iPmi + 1, iLayer} * fading{iUser} * precoder;
+                sinr = 1 / psCenter(iUser) * (fading{iUser} * precoder)' / covIn * fading{iUser} * precoder;
+                % achievable rate
+                rate(iPmi + 1, 2) = rate(iPmi + 1, 2) + log2(1 + sinr);
             end
         end
     end
+    % optimum single-layer and double-layer precoder
+    [rate, index] = max(rate);
+    % select transmit mode (1 or 2 layers) to maximise rate
+    [cqi(iUser), ri(iUser)] = max(rate);
+    pmi(iUser) = index(ri(iUser));
 end
 end
