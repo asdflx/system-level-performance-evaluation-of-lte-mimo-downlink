@@ -28,12 +28,12 @@ tDrop = 1e3;
 tScale = 1e1;
 % number of drops (i.e. generate user distributions) [X]
 nDrops = 1e2;
-% quality of service (assume equal)
-qos = ones(1, nUsers);
 % user average rate
 rate = cell(1, length(nUsers));
 %% System model
 for iUser = 1: length(nUsers)
+    % quality of service (assume equal)
+    qos = ones(1, nUsers(iUser));
     rate{iUser} = zeros(nDrops, nUsers(iUser));
     %s generate user location randomly and uniformly (assume users don't move)
     for iDrop = 1: nDrops
@@ -68,17 +68,15 @@ for iUser = 1: length(nUsers)
 end
 %% Result plot: CDF of user average rate
 figure;
-cdfplot(rate{1});
-hold on;
-cdfplot(rate{2});
-hold on;
-cdfplot(rate{3});
-hold on;
-cdfplot(rate{4});
-hold on;
-cdfplot(rate{5});
+legendString = cell(length(nUsers), 1);
+for iUser = 1: length(nUsers)
+    cdfplot(rate{iUser});
+    legendString{iUser} = sprintf('K = %d', nUsers(iUser));
+    hold on;
+end
+hold off;
 grid on; grid minor;
-legend(nUsers);
+legend(legendString, 'location', 'southeast');
 title('Influence of user number on user average rate');
 xlabel('Average rate (bps/Hz)');
 ylabel('CDF (%)');

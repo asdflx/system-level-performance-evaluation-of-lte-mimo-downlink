@@ -60,6 +60,8 @@ for iUser = 1: nUsers
         covIn = interCell + noise;
         % SINR of the current stream
         sinr = 1 / psCenter(iUser) * (fading{iUser} * precoder)' / covIn * fading{iUser} * precoder;
+        % remove imaginary part
+        sinr = real(sinr);
         % achievable rate
         rate(iPmi + 1, 1) = log2(1 + sinr);
         if nRxs == 2
@@ -82,6 +84,8 @@ for iUser = 1: nUsers
                 covIn = interStream + interCell + noise;
                 % SINR of the current stream
                 sinr = 1 / psCenter(iUser) * (fading{iUser} * precoder)' / covIn * fading{iUser} * precoder;
+                % remove imaginary part
+                sinr = real(sinr);
                 % achievable rate
                 rate(iPmi + 1, 2) = rate(iPmi + 1, 2) + log2(1 + sinr);
             end

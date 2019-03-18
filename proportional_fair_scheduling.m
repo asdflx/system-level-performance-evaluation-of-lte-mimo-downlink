@@ -25,7 +25,7 @@ function [avgRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, avgRat
 % Author & Date: Yang (i@snowztail.com) - 17 Mar 19
 
 % update the user that maximise the weighted rate function for every tScale
-if mod(iSample, tScale) == 1
+if mod(iSample, tScale) == 1 || userIndex == 0
     [~, userIndex] = max(qos .* cqi ./ avgRate);
 end
 for iUser = 1: nUsers

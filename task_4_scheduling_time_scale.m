@@ -68,15 +68,15 @@ for iScale = 1: length(tScale)
 end
 %% Result plot: CDF of user average rate
 figure;
-cdfplot(rate{1});
-hold on;
-cdfplot(rate{2});
-hold on;
-cdfplot(rate{3});
-hold on;
-cdfplot(rate{4});
+legendString = cell(length(tScale), 1);
+for iScale = 1: length(tScale)
+    cdfplot(rate{iScale});
+    legendString{iScale} = sprintf('t_c = %d', tScale(iScale));
+    hold on;
+end
+hold off;
 grid on; grid minor;
-legend(tScale);
+legend(legendString, 'location', 'southeast');
 title('Influence of scheduling time scale on user average rate');
 xlabel('Average rate (bps/Hz)');
 ylabel('CDF (%)');

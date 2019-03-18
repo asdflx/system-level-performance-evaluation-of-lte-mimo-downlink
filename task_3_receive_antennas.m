@@ -15,7 +15,7 @@ nInterfs = 6;
 % number of transmit antennas at each base station [nt]
 nTxs = 4;
 % number of receive antennas at each user [nr]
-nRxs = 2;
+nRxs = 1: 2;
 % standard deviation of shadowing (in dB) [sigmas]
 sdShadowing = 8;
 % time correlation [epsilon]
@@ -31,9 +31,9 @@ nDrops = 1e2;
 % quality of service (assume equal)
 qos = ones(1, nUsers);
 % user average rate
-rate = cell(1, nRxs);
+rate = cell(1, length(nRxs));
 %% System model
-for iRx = 1: nRxs
+for iRx = 1: length(nRxs)
     rate{iRx} = zeros(nDrops, nUsers);
     %s generate user location randomly and uniformly (assume users don't move)
     for iDrop = 1: nDrops
@@ -51,13 +51,13 @@ for iRx = 1: nRxs
             % path loss and shadowing of center and interference base stations
             [psCenter, psInterf] = pathloss_shadowing(nUsers, nInterfs, dCenter, dInterf, sdShadowing);
             % fading of center base station
-            [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporal, corTime, corSpatial, iRx, nTxs);
+            [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporal, corTime, corSpatial, nRxs(iRx), nTxs);
             % fading of interference base stations
             for iInterf = 1: nInterfs
-                [fadingInterf(iInterf, :), fadingInterfTemporal(iInterf, :)] = fading_channel(nUsers, fadingInterfTemporal(iInterf, :), corTime, corSpatialInterf, iRx, nTxs);
+                [fadingInterf(iInterf, :), fadingInterfTemporal(iInterf, :)] = fading_channel(nUsers, fadingInterfTemporal(iInterf, :), corTime, corSpatialInterf, nRxs(iRx), nTxs);
             end
             % quantised precoding matrix
-            [ri, pmi, cqi] = quantised_precoding(nUsers, iRx, fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
+            [ri, pmi, cqi] = quantised_precoding(nUsers, nRxs(iRx), fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
             % proportional fair scheduling
             [avgRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, avgRate, tScale, qos, iSample, userIndex);
             instRate(iSample, userIndex) = cqi(userIndex);
@@ -68,11 +68,15 @@ for iRx = 1: nRxs
 end
 %% Result plot: CDF of user average rate
 figure;
-cdfplot(rate{1});
-hold on;
-cdfplot(rate{2});
+legendString = cell(length(nRxs), 1);
+for iRx = 1: length(nRxs)
+    cdfplot(rate{iRx});
+    legendString{iRx} = sprintf('n_r = %d', nRxs(iRx));
+    hold on;
+end
+hold off;
 grid on; grid minor;
-legend('1-Rx', '2-Rx');
+legend(legendString, 'location', 'southeast');
 title('Influence of number of receive antennas on user average rate');
 xlabel('Average rate (bps/Hz)');
 ylabel('CDF (%)');

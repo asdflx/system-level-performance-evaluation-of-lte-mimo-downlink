@@ -68,15 +68,15 @@ for iCorTime = 1: length(corTime)
 end
 %% Result plot: CDF of user average rate
 figure;
-cdfplot(rate{1});
-hold on;
-cdfplot(rate{2});
-hold on;
-cdfplot(rate{3});
-hold on;
-cdfplot(rate{4});
+legendString = cell(length(corTime), 1);
+for iCorTime = 1: length(corTime)
+    cdfplot(rate{iCorTime});
+    legendString{iCorTime} = ['\epsilon = ', num2str(corTime(iCorTime))];
+    hold on;
+end
+hold off;
 grid on; grid minor;
-legend(corTime);
+legend(legendString, 'location', 'southeast');
 title('Influence of time correlation on user average rate');
 xlabel('Average rate (bps/Hz)');
 ylabel('CDF (%)');

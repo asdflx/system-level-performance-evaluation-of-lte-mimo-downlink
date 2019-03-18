@@ -68,17 +68,15 @@ for iCorSpatialConst = 1: length(corSpatialConst)
 end
 %% Result plot: CDF of user average rate
 figure;
-cdfplot(rate{1});
-hold on;
-cdfplot(rate{2});
-hold on;
-cdfplot(rate{3});
-hold on;
-cdfplot(rate{4});
-hold on;
-cdfplot(rate{5});
+legendString = cell(length(corSpatialConst), 1);
+for iCorSpatialConst = 1: length(corSpatialConst)
+    cdfplot(rate{iCorSpatialConst});
+    legendString{iCorSpatialConst} = ['t = ', num2str(corSpatialConst(iCorSpatialConst))];
+    hold on;
+end
+hold off;
 grid on; grid minor;
-legend(nUsers);
-title('Influence of user number on user average rate');
+legend(legendString, 'location', 'southeast');
+title('Influence of spatial correlation on user average rate');
 xlabel('Average rate (bps/Hz)');
 ylabel('CDF (%)');
