@@ -43,7 +43,7 @@ for iUser = 1: length(nUsers)
         fadingInterfTemporal = cell(nInterfs, nUsers(iUser));
         % initialise scheduled user index and the average rate
         userIndex = 0;
-        avgRate = zeros(1, nUsers(iUser)) + eps;
+        ltRate = zeros(1, nUsers(iUser)) + eps;
         instRate = zeros(tDrop, nUsers(iUser));
         % user distribution
         [dCenter, dInterf, corSpatial, corSpatialInterf] = user_distribution(dMin, dMax, nUsers(iUser), nInterfs, corSpatialConst);
@@ -59,7 +59,7 @@ for iUser = 1: length(nUsers)
             % quantised precoding matrix
             [ri, pmi, cqi] = quantised_precoding(nUsers(iUser), nRxs, fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
             % proportional fair scheduling
-            [avgRate, userIndex] = proportional_fair_scheduling(nUsers(iUser), cqi, avgRate, tScale, qos, iSample, userIndex);
+            [ltRate, userIndex] = proportional_fair_scheduling(nUsers(iUser), cqi, ltRate, tScale, qos);
             instRate(iSample, userIndex) = cqi(userIndex);
         end
         rate{iUser}(iDrop, :) = mean(instRate);

@@ -1,4 +1,4 @@
-function [avgRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, avgRate, tScale, qos, iSample, userIndex)
+function [ltRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, ltRate, tScale, qos)
 % Function:
 %   - perform proportional fair scheduling and return the long-term average
 %   rate of users
@@ -6,14 +6,12 @@ function [avgRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, avgRat
 % InputArg(s):
 %   - nUsers: number of users in one cell
 %   - cqi: the maximum achievable rate by the selected RI and PMI
-%   - avgRate: previous long-term average rate
+%   - ltRate: previous long-term average rate
 %   - tScale: scheduling time scale
 %   - qos: quality of service of users
-%   - iSample: current time instant
-%   - userIndex: user scheduled at the previous instant
 %
 % OutputArg(s):
-%   - avgRate: current long-term average rate after scheduling
+%   - ltRate: current long-term average rate after scheduling
 %   - userIndex: user scheduled at the current instant
 %
 % Comments:
@@ -24,17 +22,15 @@ function [avgRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, avgRat
 %
 % Author & Date: Yang (i@snowztail.com) - 17 Mar 19
 
-% update the user that maximise the weighted rate function for every tScale
-if mod(iSample, tScale) == 1 || userIndex == 0
-    [~, userIndex] = max(qos .* cqi ./ avgRate);
-end
+% update the user that maximise the weighted rate function at every instant
+[~, userIndex] = max(qos .* cqi ./ ltRate);
 for iUser = 1: nUsers
     if iUser == userIndex
         % scheduled at current instant
-        avgRate(iUser) = (1 - 1 / tScale) * avgRate(iUser) + 1 / tScale * cqi(iUser);
+        ltRate(iUser) = (1 - 1 / tScale) * ltRate(iUser) + 1 / tScale * cqi(iUser);
     else
         % unscheduled at current instant
-        avgRate(iUser) = (1 - 1 / tScale) * avgRate(iUser);
+        ltRate(iUser) = (1 - 1 / tScale) * ltRate(iUser);
     end
 end
 end
