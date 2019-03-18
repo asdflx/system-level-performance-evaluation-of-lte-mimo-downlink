@@ -3,7 +3,7 @@ clear; close all;
 % transmit power (in dBm) [Pt]
 pTxDbm = 46;
 pTx = db2pow(pTxDbm) / 1e3;
-% noise variance (in dBm) [sigma_n^2]
+% noise variance (in dBm) [sigman^2]
 pNoiseDbm = -174;
 pNoise = db2pow(pNoiseDbm) / 1e3;
 % number of users dropped in the center cell [K]
@@ -13,7 +13,7 @@ dMin = 35; dMax = 250;
 % coordinate of neighbour base stations to produce interference [j]
 nInterfs = 6;
 bsInterf = 2 * dMax * exp(1i * 2 * pi / nInterfs * (1: nInterfs)');
-% standard deviation of shadowing (in dB) [sigma_s]
+% standard deviation of shadowing (in dB) [sigmas]
 sdShadowing = 8;
 % spatial correlation [t]
 corSpatialConst = 0.5;
