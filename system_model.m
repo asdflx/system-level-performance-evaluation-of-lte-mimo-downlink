@@ -9,13 +9,13 @@ pNoise = db2pow(pNoiseDbm) / 1e3;
 % number of users dropped in the center cell [K]
 nUsers = 10;
 % distance covered by the cell (in meters) [d]
-dMin = 35; dMax = 250; 
+dMin = 35; dMax = 250;
 % coordinate of neighbour base stations to produce interference [j]
 nInterfs = 6;
 % number of transmit antennas at each base station [nt]
 nTxs = 4;
 % number of receive antennas at each user [nr]
-nRxs = 2;
+nRxs = 1;
 % standard deviation of shadowing (in dB) [sigmas]
 sdShadowing = 8;
 % time correlation [epsilon]
@@ -23,11 +23,11 @@ corTime = 0.85;
 % spatial correlation [t]
 corSpatialConst = 0.5;
 % drop duration (large enough to avoid transient state in the end) [T]
-tDrop = 1e3;
+tDrop = 1e2;
 % scheduling time scale [tc]
-tScale = 1e1;
+tScale = 1e2;
 % number of drops (i.e. generate user distributions) [X]
-nDrops = 1e2;
+nDrops = 1e3;
 % quality of service (assume equal)
 qos = ones(1, nUsers);
 % user average rate

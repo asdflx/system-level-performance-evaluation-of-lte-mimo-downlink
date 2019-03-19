@@ -25,9 +25,9 @@ corSpatialConst = 0.5;
 % drop duration (large enough to avoid transient state in the end) [T]
 tDrop = 1e3;
 % scheduling time scale [tc]
-tScale = [1 10 50 100];
+tScale = [1.1 10 100 1000];
 % number of drops (i.e. generate user distributions) [X]
-nDrops = 1e2;
+nDrops = 1e3;
 % quality of service (assume equal)
 qos = ones(1, nUsers);
 % user average rate
@@ -71,7 +71,7 @@ figure;
 legendString = cell(length(tScale), 1);
 for iScale = 1: length(tScale)
     cdfplot(rate{iScale});
-    legendString{iScale} = sprintf('t_c = %d', tScale(iScale));
+    legendString{iScale} = ['t_c = ', num2str(tScale(iScale))];
     hold on;
 end
 hold off;

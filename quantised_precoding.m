@@ -38,9 +38,9 @@ cqi = zeros(1, nUsers);
 %% Precoder Design
 for iPmi = 0: nPmis - 1
     % single layer transmission
-    [precoderSingle{iPmi + 1}] = codebook_csi_4tx(1, iPmi) * sqrt(pTx);
+    [precoderSingle{iPmi + 1}] = codebook_csi_4tx(1, iPmi) * (pTx) ^ (1 / 2);
     % double layer transmission
-    [precoderDouble{iPmi + 1}] = codebook_csi_4tx(2, iPmi) * sqrt(pTx / 2 * eye(2));
+    [precoderDouble{iPmi + 1}] = codebook_csi_4tx(2, iPmi) * (pTx / 2 * eye(2)) ^ (1 / 2);
 end
 %% Precoder Selection
 for iUser = 1: nUsers

@@ -1,4 +1,4 @@
-function [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporalPrev, corTime, corSpatial, nRxs, nTxs)
+function [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporal, corTime, corSpatial, nRxs, nTxs)
 % Function: 
 %   - generate spatially and temporally correlated Rayleigh flat fading
 %   channels at certain time instant for multiple users
@@ -22,14 +22,13 @@ function [fading, fadingTemporal] = fading_channel(nUsers, fadingTemporalPrev, c
 % Author & Date: Yang (i@snowztail.com) - 16 Mar 19
 
 fading = cell(1, nUsers);
-fadingTemporal = cell(1, nUsers);
 for iUser = 1: nUsers
-    if isempty(fadingTemporalPrev{iUser})
+    if isempty(fadingTemporal{iUser})
         % initial channel state
         fadingTemporal{iUser} = randn(nRxs, nTxs);
     else
         % temporally correlated to the previous state
-        fadingTemporal{iUser} = corTime * fadingTemporalPrev{iUser} + sqrt(1 - corTime ^ 2) * randn(nRxs, nTxs);
+        fadingTemporal{iUser} = corTime * fadingTemporal{iUser} + sqrt(1 - corTime ^ 2) * randn(nRxs, nTxs);
     end
     % spatially and temporally correlated channel
     fading{iUser} = fadingTemporal{iUser} * corSpatial{iUser} ^ (1 / 2);

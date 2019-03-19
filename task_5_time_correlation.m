@@ -19,15 +19,15 @@ nRxs = 1;
 % standard deviation of shadowing (in dB) [sigmas]
 sdShadowing = 8;
 % time correlation [epsilon]
-corTime = 0.05: 0.2: 0.85;
+corTime = 0: 0.25: 1;
 % spatial correlation [t]
 corSpatialConst = 0.5;
 % drop duration (large enough to avoid transient state in the end) [T]
-tDrop = 1e3;
+tDrop = 1e2;
 % scheduling time scale [tc]
-tScale = 1e1;
+tScale = 1e2;
 % number of drops (i.e. generate user distributions) [X]
-nDrops = 1e2;
+nDrops = 1e3;
 % quality of service (assume equal)
 qos = ones(1, nUsers);
 % user average rate

@@ -23,11 +23,11 @@ corTime = 0.85;
 % spatial correlation [t]
 corSpatialConst = 0.5;
 % drop duration (large enough to avoid transient state in the end) [T]
-tDrop = 1e3;
+tDrop = 1e2;
 % scheduling time scale [tc]
-tScale = 1e1;
+tScale = 1e2;
 % number of drops (i.e. generate user distributions) [X]
-nDrops = 1e2;
+nDrops = 1e3;
 % user average rate
 rate = cell(1, length(nUsers));
 %% System model
