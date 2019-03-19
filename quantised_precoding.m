@@ -55,7 +55,7 @@ for iUser = 1: nUsers
         end
         interCell = sum(cat(3, interCell{:}), 3);
         % noise
-        noise = pNoise * eye(nRxs);
+        noise = sqrt(pNoise / 2) * (randn(nRxs) + 1i * randn(nRxs));
         % covariance matrix of interference plus noise
         covIn = interCell + noise;
         % SINR of the current stream
@@ -79,7 +79,7 @@ for iUser = 1: nUsers
                 end
                 interCell = sum(cat(3, interCell{:}), 3);
                 % noise
-                noise = pNoise * eye(nRxs);
+                noise = sqrt(pNoise / 2) * (randn(nRxs) + 1i * randn(nRxs));
                 % covariance matrix of interference plus noise
                 covIn = interStream + interCell + noise;
                 % SINR of the current stream

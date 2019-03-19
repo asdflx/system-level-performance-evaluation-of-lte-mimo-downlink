@@ -25,10 +25,10 @@ fading = cell(1, nUsers);
 for iUser = 1: nUsers
     if isempty(fadingTemporal{iUser})
         % initial channel state
-        fadingTemporal{iUser} = randn(nRxs, nTxs);
+        fadingTemporal{iUser} = sqrt(1 / 2) * (randn(nRxs, nTxs) + 1i * randn(nRxs, nTxs));
     else
         % temporally correlated to the previous state
-        fadingTemporal{iUser} = corTime * fadingTemporal{iUser} + sqrt(1 - corTime ^ 2) * randn(nRxs, nTxs);
+        fadingTemporal{iUser} = corTime * fadingTemporal{iUser} + sqrt(1 - corTime ^ 2) * sqrt(1 / 2) * (randn(nRxs, nTxs) + 1i * randn(nRxs, nTxs));
     end
     % spatially and temporally correlated channel
     fading{iUser} = fadingTemporal{iUser} * corSpatial{iUser} ^ (1 / 2);
