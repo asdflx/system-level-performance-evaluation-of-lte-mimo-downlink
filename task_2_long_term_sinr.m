@@ -32,7 +32,9 @@ for iDrop = 1: nDrops
     sinr(iDrop, :) = (pTx ./ psCenter) ./ (pNoise + sum(pTx ./ psInterf));
 end
 sinrDb = pow2db(sinr);
-%% Result plot: CDF of long-term SINR
+rate = log2(1 + sinr);
+%% Result plot
+% CDF of long-term SINR
 figure;
 cdfplot(sinrDb(:));
 grid on; grid minor;
@@ -41,3 +43,11 @@ title('CDF of user long-term downlink SINR');
 xlabel('Downlink SINR (dB)');
 ylabel('CDF (%)');
 xlim([-40 60]);
+% CDF of user rate based on long-term SINR
+figure;
+cdfplot(rate(:));
+grid on; grid minor;
+legend('2D');
+title('CDF of rate by user long-term downlink SINR');
+xlabel('Average rate (bps/Hz)');
+ylabel('CDF (%)');

@@ -57,7 +57,7 @@ for iRx = 1: length(nRxs)
                 [fadingInterf(iInterf, :), fadingInterfTemporal(iInterf, :)] = fading_channel(nUsers, fadingInterfTemporal(iInterf, :), corTime, corSpatialInterf, nRxs(iRx), nTxs);
             end
             % quantised precoding matrix
-            [ri, pmi, cqi] = quantised_precoding(nUsers, nRxs(iRx), fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
+            [ri, pmi, cqi] = linear_precoding(nUsers, nRxs(iRx), fading, fadingInterf, psCenter, psInterf, pTx, pNoise);
             % proportional fair scheduling
             [ltRate, userIndex] = proportional_fair_scheduling(nUsers, cqi, ltRate, tScale, qos);
             instRate(iSample, userIndex) = cqi(userIndex);
