@@ -15,7 +15,7 @@ nInterfs = 6;
 % number of transmit antennas at each base station [nt]
 nTxs = 4;
 % number of receive antennas at each user [nr]
-nRxs = 1;
+nRxs = 2;
 % standard deviation of shadowing (in dB) [sigmas]
 sdShadowing = 8;
 % time correlation [epsilon]
